@@ -1,0 +1,197 @@
+openapi: 3.0.0
+info:
+  version: '1.1.0'
+  termsOfService: 'http://swagger.io/terms/'
+  title: API STAR WARS
+  license:
+    name: ISC
+  contact:
+    name: Rodrigo
+    email: rodrigodsalas94@gmail.com
+tags:
+  - name: Users
+    description: Endpoints relacionados con el registro y login del usuario
+  - name: Films
+    description: Endpoints relacionados con las películas
+  - name: Database
+    description: Endpoints relacionados con la base de datos
+paths:
+  /register:
+    post:
+      summary: Registra un nuevo usuario
+      description: Registra un nuevo usuario en el sistema.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Usuario registrado correctamente
+        '500':
+          description: Error interno del servidor
+
+  /login:
+    post:
+      summary: Inicia sesión
+      description: Permite a un usuario iniciar sesión en el sistema.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Sesión iniciada correctamente
+        '401':
+          description: Credenciales inválidas
+
+  /films:
+    get:
+      summary: Obtener todas las películas
+      description: Obtiene una lista de todas las películas disponibles.
+      tags:
+        - Films
+      responses:
+        '200':
+          description: Éxito. Devuelve la lista de películas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: ID de la película.
+                    title:
+                      type: string
+                      description: Título de la película.
+
+        '500':
+          description: Error interno del servidor. No se pudieron obtener las películas debido a un error en el servidor.
+
+  /films/{id}:
+    get:
+      summary: Obtiene una película por su ID
+      description: Retorna una película específica según su ID.
+      tags:
+        - Films
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID de la película a obtener
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Película encontrada correctamente
+        '404':
+          description: Película no encontrada
+        '500':
+          description: Error interno del servidor
+
+  /search/{title}:
+    get:
+      summary: Busca películas por título
+      description: Retorna películas que coincidan con el título especificado.
+      tags:
+        - Films
+      parameters:
+        - in: path
+          name: title
+          required: true
+          description: Título de la película a buscar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Películas encontradas correctamente
+        '500':
+          description: Error interno del servidor
+
+  /search/{species}:
+    get:
+      summary: Busca especies
+      description: Retorna personajes que pertenezcan a la especie especificada.
+      tags:
+        - Films
+      parameters:
+        - in: path
+          name: species
+          required: true
+          description: Nombre de la especie a buscar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Especies encontradas correctamente
+        '500':
+          description: Error interno del servidor
+
+  /characters:
+    delete:
+      summary: Eliminar personajes por título de película
+      description: Elimina los personajes asociados a una película por su título.
+      tags:
+        - Database
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filmTitle:
+                  type: string
+                  description: Título de la película para la cual se eliminarán los personajes.
+      responses:
+        '204':
+          description: Los personajes asociados a la película se eliminaron correctamente.
+        '401':
+          description: Error de autenticación. El token de autenticación es inválido o no proporcionado.
+        '500':
+          description: Error interno del servidor. No se pudieron eliminar los personajes debido a un error en el servidor.
+
+  /alldata:
+    delete:
+      summary: Elimina todos los datos de la base de datos
+      description: Elimina todas las películas y personajes de la base de datos.
+      tags:
+        - Database
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Todos los datos eliminados correctamente
+        '500':
+          description: Error al eliminar todos los datos de la base de datos
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
